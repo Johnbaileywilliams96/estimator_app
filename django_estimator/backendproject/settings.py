@@ -33,6 +33,10 @@ INSTALLED_APPS = [
     'backendapi',
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8081",
+]
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',

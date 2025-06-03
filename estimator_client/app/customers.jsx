@@ -12,7 +12,7 @@ export default function Customers() {
 
   const fetchClients = async () => {
     try {
-      const response = await fetch('http://localhost:8000/clients') // Replace with your actual API URL
+      const response = await fetch('http://localhost:8000/clients', {headers: {Authorization: `Token 1a5908171df05b095338c23f9bb5ee7154f8c11c`}}) // Replace with your actual API URL
       const data = await response.json()
       setClients(data)
     } catch (error) {
@@ -40,8 +40,8 @@ export default function Customers() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.clientItem}>
-            <Text style={styles.clientName}>{item.name}</Text>
-            <Text style={styles.clientEmail}>{item.email}</Text>
+            <Text style={styles.clientName}>{item.first_name}</Text>
+            <Text style={styles.clientEmail}>{item.email_address}</Text>
           </View>
         )}
         style={styles.list}

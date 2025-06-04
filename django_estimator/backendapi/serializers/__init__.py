@@ -1,1 +1,2 @@
 from .clients_serializer import ClientSerializer
+from .library_serializer import LibrarySerializer

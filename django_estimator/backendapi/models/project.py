@@ -11,6 +11,6 @@ class Project(models.Model):
     status_id = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, blank=True)
     total_est = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     business_type_id = models.ForeignKey(BusinessPresetType, on_delete=models.SET_NULL, null=True, blank=True)
-    created_by = models.ForeignKey(BusinessMember, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(BusinessMember, on_delete=models.CASCADE, null=True)
 
    

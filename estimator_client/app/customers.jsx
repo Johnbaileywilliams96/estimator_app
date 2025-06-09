@@ -22,6 +22,10 @@ export default function Customers() {
     }
   }
 
+  const handleProjectPress = () => {
+    router.push('../clientProjects')
+  }
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -40,7 +44,9 @@ export default function Customers() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.clientItem}>
+            <TouchableOpacity style={styles.button} onPress={handleProjectPress}>
             <Text style={styles.clientName}>{item.first_name}</Text>
+            </TouchableOpacity>
             <Text style={styles.clientEmail}>{item.email_address}</Text>
           </View>
         )}

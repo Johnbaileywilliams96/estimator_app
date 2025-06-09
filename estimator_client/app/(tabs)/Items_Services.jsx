@@ -1,58 +1,28 @@
-import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { FlatList } from 'react-native-web'
+import React from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
+import LibraryItem from '../../components/LibraryItem';
+import LoadingView from '../../components/LoadingView';
+import { useLibraries } from '../../hooks/useLibraries';
 
 const Items = () => {
-    const [libraries, setLibraries] = useState([])
-    const [loading, setLoading] = useState(true)
+    const { libraries, loading, error } = useLibraries();
 
-    useEffect(() => {
-        fetchLibraries()
-    }, [])
-
-    const fetchLibraries = async () => {
-        try {
-            const response = await fetch('http://localhost:8000/libraries', {
-                headers: {
-                    Authorization: `Token 1a5908171df05b095338c23f9bb5ee7154f8c11c`
-                }
-            }) 
-            const data = await response.json()
-            setLibraries(data)
-        } catch (error) {
-            console.error('Error fetching libraries:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    if (loading) {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.text}>Loading...</Text>
-            </View>
-        )
-    }
+    if (loading) return <LoadingView />;
+    
+    if (error) return <LoadingView message={`Error: ${error}`} />;
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Items/Services</Text>
+            <Text style={styles.title}>Items/Services</Text>
             <FlatList
                 data={libraries}
                 keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <View style={styles.libraryItem}>
-                        <Text style={styles.libraryName}>{item.name}</Text>
-                        <Text style={styles.libraryDescription}>{item.description}</Text>
-                    </View>
-                )}
+                renderItem={({ item }) => <LibraryItem item={item} />}
                 style={styles.list}
             />
         </View>
-    )
-}
-
-export default Items
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -60,12 +30,6 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    text: {
-        color: 'grey',
-        fontSize: 42,
-        fontWeight: 'bold',
-        textAlign: 'center'
     },
     title: {
         fontSize: 24,
@@ -76,20 +40,7 @@ const styles = StyleSheet.create({
     list: {
         flex: 1,
         width: '100%',
-    },
-    libraryItem: {
-        backgroundColor: '#f5f5f5',
-        padding: 15,
-        marginVertical: 5,
-        borderRadius: 8,
-    },
-    libraryName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    libraryDescription: {
-        fontSize: 14,
-        color: '#666',
-        marginTop: 4,
     }
-})
+});
+
+export default Items;

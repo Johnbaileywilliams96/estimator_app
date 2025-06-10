@@ -7,6 +7,7 @@ from backendapi.views import LibraryViewSet
 from backendapi.views import SublibraryViewSet
 from backendapi.views import ItemServicesViewSet
 from backendapi.views import BusinessViewSet
+from backendapi.views import ItemPricingViewSet
 
 
 
@@ -16,6 +17,7 @@ router.register(r'libraries', LibraryViewSet)
 router.register(r'sublibraries', SublibraryViewSet)
 router.register(r'itemservices', ItemServicesViewSet)
 router.register(r'business', BusinessViewSet, "business")
+router.register(r'pricing', ItemPricingViewSet, "pricing")
 
 
 urlpatterns = [

@@ -3,3 +3,4 @@ from .library_serializer import LibrarySerializer
 from .sublibrary_serializer import SubLibrarySerializer
 from .item_and_service_serializer import ItemsServicesSerializer
 from .business_serializer import BusinessSerializer
+from .pricing_serializer import ItemPricingSerializer

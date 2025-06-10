@@ -8,7 +8,9 @@ from backendapi.views import SublibraryViewSet
 from backendapi.views import ItemServicesViewSet
 from backendapi.views import BusinessViewSet
 from backendapi.views import ItemPricingViewSet
-
+from backendapi.views import ProjectViewSet
+from rest_framework.authtoken.views import obtain_auth_token
+from backendapi.views import login_user, register_user
 
 
 router = DefaultRouter()
@@ -18,10 +20,12 @@ router.register(r'sublibraries', SublibraryViewSet)
 router.register(r'itemservices', ItemServicesViewSet)
 router.register(r'business', BusinessViewSet, "business")
 router.register(r'pricing', ItemPricingViewSet, "pricing")
-
+router.register(r'project', ProjectViewSet, "project")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('auth/login/', login_user, name='login'),
+    path('auth/register/', register_user, name='register'),
     path('', include(router.urls)),
     path('api/', include('backendapi.urls')),  
 ]

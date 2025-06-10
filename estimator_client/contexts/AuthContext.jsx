@@ -39,27 +39,83 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, password) => {
         try {
-            const response = await fetch('http://localhost:8000/auth/login/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-            });
+            console.log('Attempting login with:', username);
+            
+            // Try multiple possible endpoints
+            const possibleEndpoints = [
+                'http://localhost:8000/auth/login/',
+                'http://localhost:8000/api/auth/login/',
+                'http://localhost:8000/api-token-auth/',
+                'http://localhost:8000/login/'
+            ];
 
+            let response;
+            let endpoint;
+            
+            for (endpoint of possibleEndpoints) {
+                try {
+                    console.log('Trying endpoint:', endpoint);
+                    response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, password }),
+                    });
+                    
+                    if (response.status !== 404) {
+                        console.log('Found working endpoint:', endpoint);
+                        break;
+                    }
+                } catch (error) {
+                    console.log('Endpoint failed:', endpoint, error.message);
+                    continue;
+                }
+            }
+
+            if (!response || response.status === 404) {
+                throw new Error('No valid login endpoint found');
+            }
+
+            console.log('Login response status:', response.status);
+            
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Login failed');
+                const errorText = await response.text();
+                console.log('Login error response:', errorText);
+                
+                let errorMessage = 'Login failed';
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.message || errorData.detail || errorData.error || 'Login failed';
+                } catch {
+                    errorMessage = errorText || 'Login failed';
+                }
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
+            console.log('Login success data:', data);
+            
+            // Handle different response formats
+            let token, userData;
+            
+            if (data.token) {
+                token = data.token;
+                userData = data.user || { username };
+            } else if (data.key) {
+                // Some Django setups use 'key' instead of 'token'
+                token = data.key;
+                userData = data.user || { username };
+            } else {
+                throw new Error('No token received from server');
+            }
             
             // Store token and user data
-            await AsyncStorage.setItem('userToken', data.token);
-            await AsyncStorage.setItem('userData', JSON.stringify(data.user));
+            await AsyncStorage.setItem('userToken', token);
+            await AsyncStorage.setItem('userData', JSON.stringify(userData));
             
-            setToken(data.token);
-            setUser(data.user);
+            setToken(token);
+            setUser(userData);
             
             return { success: true };
         } catch (error) {
@@ -70,27 +126,83 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (username, email, password) => {
         try {
-            const response = await fetch('http://localhost:8000/auth/register/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, email, password }),
-            });
+            console.log('Attempting registration with:', username, email);
+            
+            // Try multiple possible endpoints
+            const possibleEndpoints = [
+                'http://localhost:8000/auth/register/',
+                'http://localhost:8000/api/auth/register/',
+                'http://localhost:8000/register/'
+            ];
+
+            let response;
+            let endpoint;
+            
+            for (endpoint of possibleEndpoints) {
+                try {
+                    console.log('Trying registration endpoint:', endpoint);
+                    response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, email, password }),
+                    });
+                    
+                    if (response.status !== 404) {
+                        console.log('Found working registration endpoint:', endpoint);
+                        break;
+                    }
+                } catch (error) {
+                    console.log('Registration endpoint failed:', endpoint, error.message);
+                    continue;
+                }
+            }
+
+            if (!response || response.status === 404) {
+                throw new Error('No valid registration endpoint found');
+            }
+
+            console.log('Registration response status:', response.status);
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Registration failed');
+                const errorText = await response.text();
+                console.log('Registration error response:', errorText);
+                
+                let errorMessage = 'Registration failed';
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.message || errorData.detail || errorData.error || 'Registration failed';
+                } catch {
+                    errorMessage = errorText || 'Registration failed';
+                }
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
+            console.log('Registration success data:', data);
             
-            // Auto-login after registration
-            await AsyncStorage.setItem('userToken', data.token);
-            await AsyncStorage.setItem('userData', JSON.stringify(data.user));
+            // Handle different response formats
+            let token, userData;
             
-            setToken(data.token);
-            setUser(data.user);
+            if (data.token) {
+                token = data.token;
+                userData = data.user || { username, email };
+            } else if (data.key) {
+                token = data.key;
+                userData = data.user || { username, email };
+            } else {
+                // Some registration endpoints don't return a token immediately
+                console.log('Registration successful, but no token returned. User may need to login.');
+                return { success: true, needsLogin: true };
+            }
+            
+            // Auto-login after registration if token received
+            await AsyncStorage.setItem('userToken', token);
+            await AsyncStorage.setItem('userData', JSON.stringify(userData));
+            
+            setToken(token);
+            setUser(userData);
             
             return { success: true };
         } catch (error) {

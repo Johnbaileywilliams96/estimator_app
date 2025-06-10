@@ -9,9 +9,7 @@ class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
     permission_classes = [AllowAny]
-    
-    # def perform_create(self, serializer):
-    #     serializer.save(created_by=self.request.user)
+  
 
     def list(self, request):
 

@@ -3,6 +3,9 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext();
 
+// Your computer's IP address
+const BASE_URL = 'http://192.168.1.158:8000';
+
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
@@ -41,9 +44,10 @@ export const AuthProvider = ({ children }) => {
         try {
             console.log('Attempting login with:', username);
             
-            // Try multiple possible endpoints
+            // Try multiple possible endpoints (IP first, then localhost fallback)
             const possibleEndpoints = [
-                'http://localhost:8000/auth/login/',
+                `${BASE_URL}/auth/login/`,
+                'http://localhost:8000/auth/login/', // Fallback for simulator/browser
             ];
 
             let response;
@@ -126,7 +130,8 @@ export const AuthProvider = ({ children }) => {
             console.log('Attempting registration with:', username, email);
             
             const possibleEndpoints = [
-                'http://localhost:8000/auth/register/',
+                `${BASE_URL}/auth/register/`,
+                'http://localhost:8000/auth/register/', // Fallback for simulator/browser
             ];
 
             let response;
@@ -207,12 +212,53 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
+            console.log('Attempting logout...');
+            
+            // Get the current token for the logout request
+            const currentToken = token || await AsyncStorage.getItem('userToken');
+            
+            if (currentToken) {
+                try {
+                    // Call backend logout endpoint
+                    const response = await fetch(`${BASE_URL}/auth/logout/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Token ${currentToken}`,
+                        },
+                    });
+                    
+                    console.log('Backend logout response status:', response.status);
+                    
+                    if (!response.ok) {
+                        console.log('Backend logout failed, but continuing with local logout');
+                    } else {
+                        console.log('Backend logout successful');
+                    }
+                } catch (error) {
+                    console.log('Backend logout error (continuing with local logout):', error.message);
+                }
+            }
+            
+            // Always clear local storage regardless of backend response
             await AsyncStorage.removeItem('userToken');
             await AsyncStorage.removeItem('userData');
             setToken(null);
             setUser(null);
+            
+            console.log('Local logout completed');
+            
         } catch (error) {
             console.error('Logout error:', error);
+            // Even if there's an error, try to clear local state
+            try {
+                await AsyncStorage.removeItem('userToken');
+                await AsyncStorage.removeItem('userData');
+                setToken(null);
+                setUser(null);
+            } catch (clearError) {
+                console.error('Failed to clear local storage:', clearError);
+            }
         }
     };
 

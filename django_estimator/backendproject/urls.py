@@ -10,7 +10,7 @@ from backendapi.views import BusinessViewSet
 from backendapi.views import ItemPricingViewSet
 from backendapi.views import ProjectViewSet
 from rest_framework.authtoken.views import obtain_auth_token
-from backendapi.views import login_user, register_user
+from backendapi.views import login_user, register_user, logout_user
 
 
 router = DefaultRouter()
@@ -26,6 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/login/', login_user, name='login'),
     path('auth/register/', register_user, name='register'),
+    path('auth/logout/', logout_user, name='logout'),
     path('', include(router.urls)),
     path('api/', include('backendapi.urls')),  
 ]

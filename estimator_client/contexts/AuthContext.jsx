@@ -44,9 +44,6 @@ export const AuthProvider = ({ children }) => {
             // Try multiple possible endpoints
             const possibleEndpoints = [
                 'http://localhost:8000/auth/login/',
-                'http://localhost:8000/api/auth/login/',
-                'http://localhost:8000/api-token-auth/',
-                'http://localhost:8000/login/'
             ];
 
             let response;
@@ -128,11 +125,8 @@ export const AuthProvider = ({ children }) => {
         try {
             console.log('Attempting registration with:', username, email);
             
-            // Try multiple possible endpoints
             const possibleEndpoints = [
                 'http://localhost:8000/auth/register/',
-                'http://localhost:8000/api/auth/register/',
-                'http://localhost:8000/register/'
             ];
 
             let response;

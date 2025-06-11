@@ -5,4 +5,4 @@ from .item_and_service_serializer import ItemsServicesSerializer
 from .business_serializer import BusinessSerializer
 from .pricing_serializer import ItemPricingSerializer
 from .project_serializer import ProjectSerializer
-
+from .unit_of_measure_serializer import UnitOfMeasureSerializer

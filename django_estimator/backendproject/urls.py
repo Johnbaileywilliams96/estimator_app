@@ -9,6 +9,7 @@ from backendapi.views import ItemServicesViewSet
 from backendapi.views import BusinessViewSet
 from backendapi.views import ItemPricingViewSet
 from backendapi.views import ProjectViewSet
+from backendapi.views import UnitOfMeasureViewSet
 from rest_framework.authtoken.views import obtain_auth_token
 from backendapi.views import login_user, register_user, logout_user
 
@@ -21,6 +22,7 @@ router.register(r'itemservices', ItemServicesViewSet)
 router.register(r'business', BusinessViewSet, "business")
 router.register(r'pricing', ItemPricingViewSet, "pricing")
 router.register(r'project', ProjectViewSet, "project")
+router.register(r'unitofmeasure', UnitOfMeasureViewSet, "unitofmeasure")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
